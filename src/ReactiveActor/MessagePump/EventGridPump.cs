@@ -1,28 +1,33 @@
 // Default URL for triggering event grid function in the local environment.
 // http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
 
-using Microsoft.Azure.WebJobs;
+using System;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Logging;
 
-namespace EventGridMessagePump
+namespace MessagePump
 {
     public static class EventGridPump
     {
         [FunctionName("EventGridPump")]
         public static void Run(
             [EventGridTrigger]EventGridEvent eventGridEvent, 
-            [ServiceBus("eventstopic", Connection = "ServiceBus", EntityType = EntityType.Topic)]out string queueMessage,
+            [ServiceBus("eventstopic", Connection = "ServiceBus", EntityType = EntityType.Topic)]out MessageWrapper message,
             ILogger log)
         {
-            if (eventGridEvent.EventType == "Microsoft.Storage.BlobCreated")
+            if (eventGridEvent.EventType != Events.BlobCreated)
             {
-                log.LogInformation("Blob created.");
+                throw new Exception(
+                    $"Expected to be triggered by an {Events.BlobCreated} but received {eventGridEvent.EventType}.");
             }
 
-            queueMessage = eventGridEvent.Id;
+            message = new MessageWrapper
+            {
+                MessageId = eventGridEvent.Id
+            };
 
             log.LogInformation(eventGridEvent.Data.ToString());
         }
