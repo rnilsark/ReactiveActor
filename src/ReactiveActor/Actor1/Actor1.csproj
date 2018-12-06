@@ -18,7 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Actor1.IntegrationEvents\Actor1.IntegrationEvents.csproj" />
     <ProjectReference Include="..\Actor1.Interfaces\Actor1.Interfaces.csproj" />
+    <ProjectReference Include="..\Bus.Abstractions\Bus.Abstractions.csproj" />
+    <ProjectReference Include="..\Bus.AzureBlobStorage\Bus.AzureBlobStorage.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentAssertions;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.Azure.ServiceBus;
 using NUnit.Framework;
 
 namespace MessagePump.Tests
@@ -19,9 +20,9 @@ namespace MessagePump.Tests
             
             EventGridPump.Run(eventGridEvent, out var output, new StubLogger());
 
-            var expected = new MessageWrapper{MessageId = id};
+            var expected = new Message{MessageId = id};
 
-            output.Should().BeEquivalentTo(expected);
+            output.MessageId.Should().Be(expected.MessageId);
         }
     }
 }
