@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
+using Bus.MassTransit.ServiceFabric;
+using MassTransit;
+using MassTransit.Azure.ServiceBus.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
@@ -11,12 +15,36 @@ namespace Web1
 {
     internal sealed class Web1 : StatelessService
     {
+        private readonly string _connectionString;
+
         public Web1(StatelessServiceContext context)
             : base(context)
-        { }
+        {   _connectionString = context
+            .CodePackageActivationContext
+            .GetConfigurationPackageObject("Config")
+            .Settings
+            .Sections["BusConfig"]
+            .Parameters["AzureServiceBusConnectionString"].Value;
+        }
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
+            var busControl = MassTransit.Bus.Factory.CreateUsingAzureServiceBus(sbc =>
+            {
+                var host = sbc.Host(_connectionString, configurator =>
+                {
+                    configurator.OperationTimeout = TimeSpan.FromSeconds(5);
+                });
+
+                sbc.ReceiveEndpoint(
+                    host: host, 
+                    serviceContext: Context,
+                    partitionInformation: Partition.PartitionInfo,
+                    configureEndpoint: configurator => configurator.Consumer<CounterUpdatedEventConsumer>());
+
+                sbc.AutoDeleteOnIdle = TimeSpan.FromMinutes(5);
+            });
+            
             return new ServiceInstanceListener[]
             {
                 new ServiceInstanceListener(serviceContext =>
@@ -34,7 +62,8 @@ namespace Web1
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
                                     .UseUrls(url)
                                     .Build();
-                    }))
+                    }), "HttpEndpoint"),
+                new ServiceInstanceListener(serviceContext => new MassTransitCommunicationListener(busControl), "ServiceBus")
             };
         }
     }
