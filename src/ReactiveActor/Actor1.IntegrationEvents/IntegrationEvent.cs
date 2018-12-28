@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Bus.Abstractions;
 
 namespace Actor1.IntegrationEvents
 {
-    public abstract class IntegrationEvent : IMessage
+    [DataContract]
+    [KnownType(typeof(CounterUpdatedEvent))]
+    public abstract class IntegrationEvent : IEvent
     {
-        public Guid MessageId { get; } = Guid.NewGuid();
+        [DataMember]
+        public Guid MessageId { get; private set; } = Guid.NewGuid();
+        [DataMember]
         public Guid EventId { get; set; }
+        [DataMember]
         public string TypeName { get; set; }
     }
 }

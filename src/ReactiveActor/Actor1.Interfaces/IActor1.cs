@@ -12,6 +12,6 @@ namespace Actor1.Interfaces
     {
         Task<int> GetCountAsync(CancellationToken cancellationToken);
 
-        Task SetCountAsync(int count, CancellationToken cancellationToken);
+        Task SetCountAsync(SetCountCommand command, CancellationToken cancellationToken);
     }
 }

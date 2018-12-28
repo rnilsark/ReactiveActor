@@ -6,6 +6,8 @@
     <Parameter Name="Actor1ActorService_PartitionCount" DefaultValue="10" />
     <Parameter Name="Actor1ActorService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="Actor1ActorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="AzureBlobStoreConnectionString" DefaultValue="" />
+    <Parameter Name="AzureServiceBusConnectionString" DefaultValue="" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
@@ -19,6 +21,16 @@
   </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="Actor1Pkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="BusConfig">
+            <Parameter Name="AzureServiceBusConnectionString" Value="[AzureServiceBusConnectionString]" />
+            <Parameter Name="AzureBlobStoreConnectionString" Value="[AzureBlobStoreConnectionString]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
   </ServiceManifestImport>
   <DefaultServices>
     <Service Name="Web1" ServicePackageActivationMode="ExclusiveProcess">

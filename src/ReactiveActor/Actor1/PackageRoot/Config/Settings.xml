@@ -8,7 +8,8 @@
     <Parameter Name="CredentialType" Value="None" />
   </Section>
   <Section Name="BusConfig">
-    <Parameter Name="BlobStorageConnectionString" Value="DefaultEndpointsProtocol=https;AccountName=reactiveactor;AccountKey=k9A6JF0FLcm7ryT00o8L1Doo6k9mc3Qhr8/eKo/dJvsSaHNMKZBck0vJP2ownUHnxrejgQ/7Bo2kk+VSgOm4Tw==;EndpointSuffix=core.windows.net" />
+    <Parameter Name="AzureBlobStoreConnectionString" Value="" />
+    <Parameter Name="AzureServiceBusConnectionString" Value="" />
   </Section>
   <!-- The content will be generated during build -->
 </Settings>

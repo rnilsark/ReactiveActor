@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Bus.AzureBlobStorage
 {
-    public class IntegrationBus : IBus
+    public class IntegrationBus : IIntegrationBus
     {
         private readonly CloudStorageAccount _storageAccount;
 
@@ -24,7 +24,7 @@ namespace Bus.AzureBlobStorage
             throw new ArgumentException($"Not a valid connection string {blobStorageConnectionString}.");
         }
 
-        public async Task Publish(IMessage message)
+        public async Task Publish<T>(T message) where T : class, IEvent
         {
             var cloudBlobClient = _storageAccount.CreateCloudBlobClient();
             var cloudBlobContainer = cloudBlobClient.GetContainerReference("events");

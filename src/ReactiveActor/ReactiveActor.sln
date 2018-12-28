@@ -15,11 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePump", "MessagePump\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePump.Tests", "MessagePump.Tests\MessagePump.Tests.csproj", "{677834AC-9EE2-4AA0-8C38-71EB8337D554}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actor1.IntegrationEvents", "Actor1.IntegrationEvents\Actor1.IntegrationEvents.csproj", "{24C146C6-B2EB-4881-8161-3FA313722CB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Actor1.IntegrationEvents", "Actor1.IntegrationEvents\Actor1.IntegrationEvents.csproj", "{24C146C6-B2EB-4881-8161-3FA313722CB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bus.Abstractions", "Bus.Abstractions\Bus.Abstractions.csproj", "{963A8FFA-6B34-4EAE-BD04-D5C45A40ED37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bus.Abstractions", "Bus.Abstractions\Bus.Abstractions.csproj", "{963A8FFA-6B34-4EAE-BD04-D5C45A40ED37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bus.AzureBlobStorage", "Bus.AzureBlobStorage\Bus.AzureBlobStorage.csproj", "{6D771C8E-58D6-406A-A738-55F86A5ABFFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bus.AzureBlobStorage", "Bus.AzureBlobStorage\Bus.AzureBlobStorage.csproj", "{6D771C8E-58D6-406A-A738-55F86A5ABFFF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bus.Tests", "Bus.Tests\Bus.Tests.csproj", "{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bus.MassTransit", "Bus.MassTransit\Bus.MassTransit.csproj", "{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{CEBE1B76-510B-4A5D-9134-BAA835643DF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,9 +107,32 @@ Global
 		{6D771C8E-58D6-406A-A738-55F86A5ABFFF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6D771C8E-58D6-406A-A738-55F86A5ABFFF}.Release|x64.ActiveCfg = Release|Any CPU
 		{6D771C8E-58D6-406A-A738-55F86A5ABFFF}.Release|x64.Build.0 = Release|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Debug|x64.Build.0 = Debug|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Release|x64.ActiveCfg = Release|Any CPU
+		{5057A8EC-15BC-4A83-A8D5-8D6CD0B134A5}.Release|x64.Build.0 = Release|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Debug|x64.Build.0 = Debug|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Release|x64.ActiveCfg = Release|Any CPU
+		{E98D8B9F-A4B4-402D-96BE-3D37B3698F23}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{78DAE155-6BB0-4EE5-9760-759CC1CB9D0D} = {CEBE1B76-510B-4A5D-9134-BAA835643DF5}
+		{1BC55EBF-3CB1-47B8-83EF-B51772EC9FF7} = {CEBE1B76-510B-4A5D-9134-BAA835643DF5}
+		{FF1BF67F-262E-44A9-AC47-116916C265DD} = {CEBE1B76-510B-4A5D-9134-BAA835643DF5}
+		{BF847165-5920-4926-B113-BDADF4B9DA02} = {CEBE1B76-510B-4A5D-9134-BAA835643DF5}
+		{24C146C6-B2EB-4881-8161-3FA313722CB7} = {CEBE1B76-510B-4A5D-9134-BAA835643DF5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A134597-42BC-4D7E-8D43-BC546D2BED94}

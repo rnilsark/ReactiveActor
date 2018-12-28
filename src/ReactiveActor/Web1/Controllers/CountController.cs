@@ -20,9 +20,9 @@ namespace Web1.Controllers
         }
 
         [HttpPost("{id}")]
-        public async Task Post(Guid id, [FromBody] int count)
+        public async Task Post(Guid id, [FromBody] SetCountCommand command)
         {
-            await ActorProxy.Create<IActor1>(new ActorId(id)).SetCountAsync(count, CancellationToken.None);
+            await ActorProxy.Create<IActor1>(new ActorId(id)).SetCountAsync(command, CancellationToken.None);
         }
     }
 }
