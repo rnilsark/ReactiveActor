@@ -43,11 +43,11 @@ namespace Actor1
                 });
 
                 sbc.ReceiveEndpoint(
-                    host: host, 
+                    host: host,
                     serviceContext: Context,
                     partitionInformation: Partition.PartitionInfo,
                     configureEndpoint: configurator => configurator.Consumer(() => new CounterUpdatedEventConsumer(StateProvider)));
-                
+
                 sbc.AutoDeleteOnIdle = TimeSpan.FromMinutes(5);
             });
             

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Actor1.IntegrationEvents;
@@ -13,15 +12,12 @@ namespace Actor1
     [StatePersistence(StatePersistence.Persisted)]
     internal class Actor1 : Actor, IActor1, IMessageProducer, IRemindable
     {
-        private const string OutboxStateName = "__outbox";
-        private const string OutboxReminderName = "__outbox";
-
-        private readonly Outbox<IntegrationEvent> _outbox;
+        private readonly ReminderOutbox<ICounterEvent> _outbox;
 
         public Actor1(Actor1Service actorService, ActorId actorId)
             : base(actorService, actorId)
         {
-            _outbox = new Outbox<IntegrationEvent>(this, actorService.Bus, OutboxStateName);
+            _outbox = new ReminderOutbox<ICounterEvent>(this, actorService.Bus);
         }
 
         Task<int> IActor1.GetCountAsync(CancellationToken cancellationToken)
@@ -31,17 +27,35 @@ namespace Actor1
 
         public async Task SetCountAsync(SetCountCommand command, CancellationToken cancellationToken)
         {
-            var integrationEvent = new CounterUpdatedEvent
-            {
-                EventId = Guid.NewGuid(),
-                CounterId = this.GetActorId().GetGuidId()
-            };
+            var count = await StateManager.TryGetStateAsync<int>("count", cancellationToken);
+            var countValue = count.HasValue ? count.Value : 0;
             
             await StateManager.AddOrUpdateStateAsync("count", command.Count, (key, value) => command.Count > value ? command.Count : value, cancellationToken);
-            
-            await _outbox.Add(integrationEvent, cancellationToken);
-            
-            ActorEventSource.Current.ActorMessage(this, nameof(CounterUpdatedEvent));
+
+            if (command.Count > countValue)
+            {
+                await _outbox.Add(new CounterIncreasedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CounterId = this.GetActorId().GetGuidId()
+                }, cancellationToken);
+
+                ActorEventSource.Current.ActorMessage(this, nameof(CounterIncreasedEvent));
+            }
+            else if (command.Count < countValue)
+            {
+                await _outbox.Add(new CounterDecreasedEvent
+                {
+                    EventId = Guid.NewGuid(),
+                    CounterId = this.GetActorId().GetGuidId()
+                }, cancellationToken);
+
+                ActorEventSource.Current.ActorMessage(this, nameof(CounterDecreasedEvent));
+            }
+            else
+            {
+                ActorEventSource.Current.ActorMessage(this, "No-op");
+            }
         }
         
         protected override Task OnActivateAsync()
@@ -50,32 +64,9 @@ namespace Actor1
             return StateManager.TryAddStateAsync("count", 0);
         }
 
-        public async Task ReceiveReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period)
+        public Task ReceiveReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period)
         {
-            // TODO: Handle receive and move retry logic to Outbox
-            if (reminderName == OutboxReminderName)
-            {
-                var attempt = BitConverter.ToInt32(state);
-
-                try
-                {
-                    await _outbox.Publish();
-                    ActorEventSource.Current.Message($"Published events.");
-                }
-                catch (Exception)
-                {
-                    ActorEventSource.Current.ActorMessage(this, $"Failed {nameof(_outbox.Publish)} attempt {attempt}." );
-
-                    if (attempt > 3)
-                    {
-                        throw;
-                    }
-
-                    var retryTimeWithBackOff = TimeSpan.FromSeconds((1+attempt) * 2);
-                    await RegisterReminderAsync(OutboxReminderName, BitConverter.GetBytes(++attempt), retryTimeWithBackOff, RemindMe.Never);
-                    ActorEventSource.Current.ActorMessage(this, $"Retrying in {retryTimeWithBackOff} seconds." );
-                }
-            }
+            return _outbox.HandleReminderAsync(reminderName, state, maxAttempts: 10);
         }
 
         public new Task RegisterReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period)

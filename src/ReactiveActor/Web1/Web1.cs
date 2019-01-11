@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
+using Actor1.IntegrationEvents;
 using Bus.MassTransit.ServiceFabric;
 using MassTransit;
 using MassTransit.Azure.ServiceBus.Core;
@@ -37,15 +38,20 @@ namespace Web1
                 });
 
                 sbc.ReceiveEndpoint(
-                    host: host, 
+                    host: host,
                     serviceContext: Context,
                     partitionInformation: Partition.PartitionInfo,
-                    configureEndpoint: configurator => configurator.Consumer<CounterUpdatedEventConsumer>());
+                    configureEndpoint: configurator =>
+                    {
+                        configurator.Consumer<CounterEventConsumer>();
+                        configurator.Consumer<NoOpConsumer<CounterIncreasedEvent>>(); // This sets up subscription, the generic consumer above consumes it.
+                        configurator.Consumer<NoOpConsumer<CounterDecreasedEvent>>(); // This sets up subscription, the generic consumer above consumes it.
+                    });
 
                 sbc.AutoDeleteOnIdle = TimeSpan.FromMinutes(5);
             });
             
-            return new ServiceInstanceListener[]
+            return new[]
             {
                 new ServiceInstanceListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>

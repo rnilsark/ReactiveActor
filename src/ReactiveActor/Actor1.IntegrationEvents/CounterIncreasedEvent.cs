@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Actor1.IntegrationEvents
 {
     [DataContract]
-    public class CounterUpdatedEvent : IntegrationEvent
+    public class CounterIncreasedEvent : IntegrationEvent, ICounterEvent
     {
         [DataMember]
         public Guid CounterId { get; set; }

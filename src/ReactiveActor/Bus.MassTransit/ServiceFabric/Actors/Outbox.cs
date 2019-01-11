@@ -7,43 +7,45 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace Bus.MassTransit.ServiceFabric.Actors
 {
-    public interface IMessageProducer : IRemindable
+    public class Outbox<T> : IOutbox<T> where T: class, IMessage
     {
-        IActorStateManager StateManager { get; }
-        Task RegisterReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period);
-    }
-
-    public class Outbox<T> where T: IMessage
-    {
-        private readonly IMessageProducer _actor;
+        private readonly IActorStateManager _stateManager;
         private readonly IIntegrationBus _bus;
         private readonly string _stateName;
-        
-        public Outbox(IMessageProducer actor, IIntegrationBus bus, string stateName)
+
+        public Outbox(IActorStateManager stateManager, IIntegrationBus bus, string stateName = "__outbox")
         {
-            _actor = actor;
+            _stateManager = stateManager;
             _bus = bus;
             _stateName = stateName;
         }
 
+        public event Func<EventArgs, Task> Added;
+
         public async Task Add(T message, CancellationToken cancellationToken = default(CancellationToken))
         {
-            await _actor.StateManager.AddOrUpdateStateAsync(_stateName, new T[] {message}, (key, value) => value.Union(new[]{message}).ToArray(), cancellationToken);
-            await _actor.RegisterReminderAsync(_stateName, BitConverter.GetBytes(0), TimeSpan.FromMilliseconds(100), RemindMe.Never);
+            await _stateManager.AddOrUpdateStateAsync(_stateName, new[] {message}, (key, value) => value.Union(new[]{message}).ToArray(), cancellationToken);
+            await OnAdded();
         }
-
-        public async Task Publish(CancellationToken cancellationToken = default(CancellationToken))
+        
+        public async Task DispatchAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var outbox = await _actor.StateManager.TryGetStateAsync<T[]>(_stateName, cancellationToken);
+            var outbox = await _stateManager.TryGetStateAsync<T[]>(_stateName, cancellationToken);
 
             if (!outbox.HasValue)
                 return;
 
             foreach (var message in outbox.Value)
             {
-                await _bus.Publish((dynamic) message);
+                await _bus.Publish((dynamic)message);
             }
-            await _actor.StateManager.RemoveStateAsync(_stateName, cancellationToken);
+
+            await _stateManager.RemoveStateAsync(_stateName, cancellationToken);
+        }
+
+        protected virtual Task OnAdded()
+        {
+            return Added?.Invoke(EventArgs.Empty);
         }
     }
 }

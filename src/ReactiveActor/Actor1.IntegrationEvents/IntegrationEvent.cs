@@ -5,7 +5,8 @@ using Bus.Abstractions;
 namespace Actor1.IntegrationEvents
 {
     [DataContract]
-    [KnownType(typeof(CounterUpdatedEvent))]
+    [KnownType(typeof(CounterIncreasedEvent))]
+    [KnownType(typeof(CounterDecreasedEvent))]
     public abstract class IntegrationEvent : IEvent
     {
         [DataMember]

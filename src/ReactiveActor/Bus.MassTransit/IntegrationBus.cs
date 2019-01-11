@@ -18,7 +18,7 @@ namespace Bus.MassTransit
             return _bus.Publish(message, context => Configure(context));
         }
 
-        private static void Configure<T>(PublishContext<T> context) where T : class, IEvent
+        private static void Configure<T>(PublishContext<T> context) where T : class, IMessage
         {
             //TODO: CorrelationId
         }

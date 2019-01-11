@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace Actor1
 {
-    internal class CounterUpdatedEventConsumer : IConsumer<CounterUpdatedEvent>
+    internal class CounterUpdatedEventConsumer : IConsumer<CounterIncreasedEvent>
     {
         private readonly IActorStateProvider _stateProvider;
 
@@ -18,9 +18,9 @@ namespace Actor1
             _stateProvider = stateProvider;
         }
 
-        public async Task Consume(ConsumeContext<CounterUpdatedEvent> context)
+        public async Task Consume(ConsumeContext<CounterIncreasedEvent> context)
         {
-            ActorEventSource.Current.Message($"{nameof(Actor1)}: Received {nameof(CounterUpdatedEvent)} with id {context.Message.MessageId}.");
+            ActorEventSource.Current.Message($"{nameof(Actor1)}: Received {nameof(CounterIncreasedEvent)} with id {context.Message.MessageId}.");
    
             // TODO: Partition aware routing.
             var actorId = new ActorId(context.Message.CounterId);
