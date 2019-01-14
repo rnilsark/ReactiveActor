@@ -6,7 +6,7 @@ namespace Bus.MassTransit.ServiceFabric.Actors
     {
         public TimeSpan GetDue(int attempt)
         {
-            return TimeSpan.FromSeconds(Fib(attempt));
+            return TimeSpan.FromMilliseconds(Fib(attempt) * 100);
         }
 
         private static int Fib(int n)

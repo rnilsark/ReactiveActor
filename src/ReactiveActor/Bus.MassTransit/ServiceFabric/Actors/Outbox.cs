@@ -13,19 +13,16 @@ namespace Bus.MassTransit.ServiceFabric.Actors
         private readonly IIntegrationBus _bus;
         private readonly string _stateName;
 
-        public Outbox(IActorStateManager stateManager, IIntegrationBus bus, string stateName = "__outbox")
+        public Outbox(IActorStateManager stateManager, IIntegrationBus bus, string stateName = null)
         {
             _stateManager = stateManager;
             _bus = bus;
-            _stateName = stateName;
+            _stateName = stateName ?? "__outbox";
         }
 
-        public event Func<EventArgs, Task> Added;
-
-        public async Task Add(T message, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task AddAsync(T message, CancellationToken cancellationToken = default(CancellationToken))
         {
             await _stateManager.AddOrUpdateStateAsync(_stateName, new[] {message}, (key, value) => value.Union(new[]{message}).ToArray(), cancellationToken);
-            await OnAdded();
         }
         
         public async Task DispatchAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -41,11 +38,6 @@ namespace Bus.MassTransit.ServiceFabric.Actors
             }
 
             await _stateManager.RemoveStateAsync(_stateName, cancellationToken);
-        }
-
-        protected virtual Task OnAdded()
-        {
-            return Added?.Invoke(EventArgs.Empty);
         }
     }
 }

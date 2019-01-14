@@ -34,7 +34,7 @@ namespace Actor1
 
             if (command.Count > countValue)
             {
-                await _outbox.Add(new CounterIncreasedEvent
+                await _outbox.AddAsync(new CounterIncreasedEvent
                 {
                     EventId = Guid.NewGuid(),
                     CounterId = this.GetActorId().GetGuidId()
@@ -44,7 +44,7 @@ namespace Actor1
             }
             else if (command.Count < countValue)
             {
-                await _outbox.Add(new CounterDecreasedEvent
+                await _outbox.AddAsync(new CounterDecreasedEvent
                 {
                     EventId = Guid.NewGuid(),
                     CounterId = this.GetActorId().GetGuidId()
